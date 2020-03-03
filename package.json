@@ -1,0 +1,40 @@
+{
+  "name": "full_connect",
+  "version": "1.0.0",
+  "repository": "https://github.com/dieguiviti/full_connect.git",
+  "description": "Social Network App for Full Crossfitters",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "Social",
+    "network",
+    "app",
+    "mern",
+    "mongodb",
+    "expressjs",
+    "reactjs",
+    "nodejs",
+    "javascript",
+    "redux",
+    "jwt",
+    "json"
+  ],
+  "author": "dieguiviti",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^0.19.2",
+    "bcrypt": "^4.0.1",
+    "config": "^3.3.0",
+    "express": "^4.17.1",
+    "express-validator": "^6.4.0",
+    "gravatar": "^1.8.0",
+    "jsonwebtoken": "^8.5.1",
+    "mongoose": "^5.9.3"
+  },
+  "devDependencies": {
+    "concurrently": "^5.1.0",
+    "nodemon": "^2.0.2"
+  }
+}
