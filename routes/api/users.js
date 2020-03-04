@@ -19,6 +19,12 @@ const VALIDATORS = [
   ).isLength({ min: 6 })
 ];
 
+//
+//
+// ROUTES BELOW
+//
+//
+
 /*
     @Route          POST api/users
     @Description    POST a user to DB (Register)
@@ -38,7 +44,7 @@ ROUTER.post('/', VALIDATORS, async (request, response) => {
     // Attempt to find the user in the database
     let user = await USER.findOne({ email });
     if (user) {
-      response
+      return response
         .status(400)
         .json({ errors: [{ message: 'User already exists' }] });
     }
@@ -49,6 +55,7 @@ ROUTER.post('/', VALIDATORS, async (request, response) => {
     user = new USER({
       name,
       email,
+      avatar: AVATAR,
       password
     });
     // Encrypt the user's password
