@@ -12,6 +12,9 @@ const APP = EXPRESS();
 // Connect to database
 CONNECT_DB();
 
+// Initialize middleware
+APP.use(EXPRESS.json({ extended: false }));
+
 /* Test request
     APP.get('/', (request, response) => response.send('API RUNNING'));
 */
