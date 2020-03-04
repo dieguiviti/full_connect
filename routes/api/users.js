@@ -71,12 +71,11 @@ ROUTER.post('/', VALIDATORS, async (request, response) => {
         id: user.id
       }
     };
-
     const SECRET = CONFIG.get('jwtSecret');
     const TOKEN_OPTIONS = { expiresIn: 360000 };
     const VERIFY_TOKEN_AND_SEND = (error, token) => {
       if (error) throw error;
-      response.json({ user, token });
+      response.json({ token });
     };
 
     JWT.sign(PAYLOAD, SECRET, TOKEN_OPTIONS, VERIFY_TOKEN_AND_SEND);
