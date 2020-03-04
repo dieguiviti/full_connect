@@ -2,6 +2,8 @@ const ROUTER = require('express').Router();
 const USER = require('../../models/User');
 const GRAVATAR = require('gravatar');
 const BCRYPT = require('bcryptjs');
+const JWT = require('jsonwebtoken');
+const CONFIG = require('config');
 const { check, validationResult } = require('express-validator');
 
 // User data validators
@@ -63,10 +65,25 @@ ROUTER.post('/', VALIDATORS, async (request, response) => {
     user.password = await BCRYPT.hash(password, SALT);
     // Save User to database
     await user.save();
-    // Return JSON Web Token
+    // Assign and sign JSON Web Token
+    const PAYLOAD = {
+      user: {
+        id: user.id
+      }
+    };
+
+    const SECRET = CONFIG.get('jwtSecret');
+    const TOKEN_OPTIONS = { expiresIn: 360000 };
+    const VERIFY_TOKEN_AND_SEND = (error, token) => {
+      if (error) throw error;
+      response.json({ user, token });
+    };
+
+    JWT.sign(PAYLOAD, SECRET, TOKEN_OPTIONS, VERIFY_TOKEN_AND_SEND);
 
     // Return Response to client
-    response.send('User saved to database');
+
+    // catch server errors
   } catch (error) {
     console.log(error.message);
     // At this line, any errors are server related
