@@ -25,10 +25,10 @@ const PROFILES_ROUTER = require('./routes/api/profiles');
 const POSTS_ROUTER = require('./routes/api/posts');
 const AUTH_ROUTER = require('./routes/api/auth');
 // Define Routes
-APP.use('/api/users', USERS_ROUTER);
-APP.use('/api/profiles', PROFILES_ROUTER);
-APP.use('/api/posts', POSTS_ROUTER);
-APP.use('/api/auth', AUTH_ROUTER);
+APP.use('/api/users/', USERS_ROUTER);
+APP.use('/api/profiles/', PROFILES_ROUTER);
+APP.use('/api/posts/', POSTS_ROUTER);
+APP.use('/api/auth/', AUTH_ROUTER);
 
 //Determine post
 const PORT = process.env.PORT || 5000;

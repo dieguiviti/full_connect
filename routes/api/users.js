@@ -1,5 +1,5 @@
 const ROUTER = require('express').Router();
-const USER = require('../../models/User');
+const USER_MODEL = require('../../models/User');
 const GRAVATAR = require('gravatar');
 const BCRYPT = require('bcryptjs');
 const JWT = require('jsonwebtoken');
@@ -54,7 +54,7 @@ ROUTER.post('/', VALIDATORS, async (request, response) => {
     const AVATAR_OPTIONS = { s: '20', r: 'pg', d: 'mm' };
     const AVATAR = GRAVATAR.url(email, AVATAR_OPTIONS);
     // Instatiate a New User
-    user = new USER({
+    user = new USER_MODEL({
       name,
       email,
       avatar: AVATAR,
