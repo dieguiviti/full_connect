@@ -44,7 +44,7 @@ ROUTER.post('/', VALIDATORS, async (request, response) => {
 
   try {
     // Attempt to find the user in the database
-    let user = await USER.findOne({ email });
+    let user = await USER_MODEL.findOne({ email });
     if (user) {
       return response
         .status(400)
