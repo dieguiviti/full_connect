@@ -5,7 +5,7 @@ const USER_MODEL = require('../../models/User');
 const { check, validationResult } = require('express-validator');
 
 // User profile creation required data Validation
-const VALIDATORS = [
+const PROFILE_VALIDATORS = [
   check('box', 'A box is required')
     .not()
     .isEmpty(),
@@ -19,6 +19,48 @@ const VALIDATORS = [
     .not()
     .isEmpty(),
   check('weakness', 'Weakness is required')
+    .not()
+    .isEmpty()
+];
+// trainer credential data validation
+const CREDENTIAL_VALIDATORS = [
+  check('credential', 'Credential is required')
+    .not()
+    .isEmpty(),
+  check('issuer', 'An issuer is required')
+    .not()
+    .isEmpty(),
+  check('issueDate', 'An issue date is required')
+    .not()
+    .isEmpty()
+];
+// Competition data validation
+const COMPETITION_VALIDATORS = [
+  check('competitionName', 'A competition name is required')
+    .not()
+    .isEmpty(),
+  check('location', 'A location is required')
+    .not()
+    .isEmpty(),
+  check('finishDate', 'A finish date is required')
+    .not()
+    .isEmpty()
+];
+// Personal Record data validation
+const PR_VALIDATORS = [
+  check('movement', 'A movement is required')
+    .not()
+    .isEmpty(),
+  check('weight', 'A weight must be specified')
+    .not()
+    .isEmpty()
+];
+// Max Repetitions data validation
+const MR_VALIDATORS = [
+  check('movement', 'A movement is required')
+    .not()
+    .isEmpty(),
+  check('reps', 'A weight must be specified')
     .not()
     .isEmpty()
 ];
@@ -48,38 +90,13 @@ const BOX_FORMATTED = box => {
 //
 //
 //
-/*
-    @Route          GET api/profile/me
-    @Description    GET current user's profile
-    @Access         Private
-*/
-ROUTER.get('/me', AUTH, async (request, response) => {
-  try {
-    // find and set Profile to the request.user.id's corresponding profile
-    const PROFILE = await PROFILE_MODEL.findOne({
-      user: request.user.id
-    }).populate('user', ['name', 'avatar']); // Populate the user prop with name and avatar
-
-    // No profile? Send code 400
-    if (!PROFILE)
-      return response
-        .status(400)
-        .json({ message: 'No profile yet, create one' });
-
-    // All good, send profile to client
-    response.json(PROFILE);
-  } catch (error) {
-    console.log(error.message);
-    response.status(500).send('Server Error');
-  }
-});
 
 /*
     @Route          POST api/profile/
     @Description    Create or update user profile
     @Access         Private
 */
-ROUTER.post('/', [AUTH, VALIDATORS], async (request, response) => {
+ROUTER.post('/', [AUTH, PROFILE_VALIDATORS], async (request, response) => {
   const ERRORS = validationResult(request);
   // Check for errors in request
   if (!ERRORS.isEmpty()) {
@@ -148,6 +165,278 @@ ROUTER.post('/', [AUTH, VALIDATORS], async (request, response) => {
   } catch (error) {
     console.error(error.message);
     return response.status(500).send(error + 'Server Error');
+  }
+});
+
+/*
+    @Route          GET api/profile/me
+    @Description    GET current user's profile
+    @Access         Private
+*/
+ROUTER.get('/me', AUTH, async (request, response) => {
+  try {
+    // find and set Profile to the request.user.id's corresponding profile
+    const PROFILE = await PROFILE_MODEL.findOne({
+      user: request.user.id
+    }).populate('user', ['name', 'avatar']); // Populate the user prop with name and avatar
+
+    // No profile? Send code 400
+    if (!PROFILE)
+      return response
+        .status(400)
+        .json({ message: 'No profile yet, create one' });
+
+    // All good, send profile to client
+    response.json(PROFILE);
+  } catch (error) {
+    console.log(error.message);
+    response.status(500).send('Server Error');
+  }
+});
+
+/*
+    @Route          DELETE api/profile/me
+    @Description    DELETE current user's profile, account and posts
+    @Access         Private
+*/
+ROUTER.delete('/me', AUTH, async (request, response) => {
+  try {
+    // find and delete Profile from db
+    await PROFILE_MODEL.findOneAndRemove({ user: request.user.id });
+    await USER_MODEL.findOneAndRemove({ _id: request.user.id });
+    // All good, send profile to client
+    response.json({ message: 'User Deleted' });
+    //
+  } catch (error) {
+    console.log(error.message);
+    response.status(500).send('Server Error');
+  }
+});
+
+/*
+    @Route          PUT api/profiles/me/credentials
+    @Description    add trainer credentials
+    @Access         Private
+*/
+ROUTER.put(
+  '/me/credentials/',
+  [AUTH, CREDENTIAL_VALIDATORS],
+  async (request, response) => {
+    const ERRORS = validationResult(request);
+    // Any errors?
+    if (!ERRORS.isEmpty) {
+      return response.status(400).json({ errors: ERRORS.array() });
+    }
+    // No errors? Assign props
+    const { credential, issuer, issueDate, credentialLink } = request.body;
+    // Create new credential object
+    const NEW_CREDENTIAL = {
+      credential,
+      issuer,
+      issueDate,
+      credentialLink
+    };
+    // Attempt to find profile in db and assign new credential
+    try {
+      const TARGET_PROFILE = await PROFILE_MODEL.findOne({
+        user: request.user.id
+      });
+      TARGET_PROFILE.trainerCredentials.unshift(NEW_CREDENTIAL);
+      // save to db
+      TARGET_PROFILE.save();
+      // Respond to client
+      response.json(TARGET_PROFILE.trainerCredentials);
+      //
+    } catch (error) {
+      console.error(error.message);
+      response
+        .status(500)
+        .send('Server Error, please refer to someone in charge');
+    }
+  }
+);
+
+/*
+    @Route          PUT api/profiles/me/competitions
+    @Description    add competition to profile
+    @Access         Private
+*/
+ROUTER.put(
+  '/me/competitions/',
+  [AUTH, COMPETITION_VALIDATORS],
+  async (request, response) => {
+    const ERRORS = validationResult(request);
+    // Any errors?
+    if (!ERRORS.isEmpty) {
+      return response.status(400).json({ errors: ERRORS.array() });
+    }
+    // No errors? Assign props
+    const {
+      competitionName,
+      division,
+      standing,
+      location,
+      finishDate
+    } = request.body;
+    // Create new credential object
+    const NEW_COMPETITION = {
+      competitionName,
+      division,
+      standing,
+      location,
+      finishDate
+    };
+    // Attempt to find profile in db and assign new credential
+    try {
+      const TARGET_PROFILE = await PROFILE_MODEL.findOne({
+        user: request.user.id
+      });
+      TARGET_PROFILE.competitions.unshift(NEW_COMPETITION);
+      // save to db
+      TARGET_PROFILE.save();
+      // Respond to client
+      response.json(TARGET_PROFILE.competitions);
+      //
+    } catch (error) {
+      console.error(error.message);
+      response
+        .status(500)
+        .send('Server Error, please refer to someone in charge');
+    }
+  }
+);
+
+/*
+    @Route          PUT api/profiles/me/personalrecords
+    @Description    add personal record to profile
+    @Access         Private
+*/
+ROUTER.put(
+  '/me/personalrecords/',
+  [AUTH, PR_VALIDATORS],
+  async (request, response) => {
+    const ERRORS = validationResult(request);
+    // Any errors?
+    if (!ERRORS.isEmpty) {
+      return response.status(400).json({ errors: ERRORS.array() });
+    }
+    // No errors? Assign props
+    const { movement, weight } = request.body;
+    // Create new credential object
+    const NEW_PR = {
+      movement,
+      weight
+    };
+    // Attempt to find profile in db and assign new credential
+    try {
+      const TARGET_PROFILE = await PROFILE_MODEL.findOne({
+        user: request.user.id
+      });
+      TARGET_PROFILE.personalRecords.unshift(NEW_PR);
+      // save to db
+      TARGET_PROFILE.save();
+      // Respond to client
+      response.json(TARGET_PROFILE.personalRecords);
+      //
+    } catch (error) {
+      console.error(error.message);
+      response
+        .status(500)
+        .send('Server Error, please refer to someone in charge');
+    }
+  }
+);
+
+/*
+    @Route          PUT api/profiles/me/maxrepetitions
+    @Description    add max repetition to profile
+    @Access         Private
+*/
+ROUTER.put(
+  '/me/maxrepetitions/',
+  [AUTH, MR_VALIDATORS],
+  async (request, response) => {
+    const ERRORS = validationResult(request);
+    // Any errors?
+    if (!ERRORS.isEmpty) {
+      return response.status(400).json({ errors: ERRORS.array() });
+    }
+    // No errors? Assign props
+    const { movement, reps } = request.body;
+    // Create new credential object
+    const NEW_MR = {
+      movement,
+      reps
+    };
+    // Attempt to find profile in db and assign new credential
+    try {
+      const TARGET_PROFILE = await PROFILE_MODEL.findOne({
+        user: request.user.id
+      });
+      TARGET_PROFILE.maxRepetitions.unshift(NEW_MR);
+      // save to db
+      TARGET_PROFILE.save();
+      // Respond to client
+      response.json(TARGET_PROFILE.maxRepetitions);
+      //
+    } catch (error) {
+      console.error(error.message);
+      response
+        .status(500)
+        .send('Server Error, please refer to someone in charge');
+    }
+  }
+);
+
+/*
+    @Route          GET api/profiles
+    @Description    list all profiles
+    @Access         Public
+*/
+ROUTER.get('/', async (request, response) => {
+  try {
+    // Grab profiles
+    const PROFILES = await PROFILE_MODEL.find().populate('user', [
+      'name',
+      'avatar'
+    ]);
+    // Respond to client
+    response.json(PROFILES);
+  } catch (error) {
+    console.error(error.message);
+    response.status(500).send('Server Error');
+  }
+});
+
+/*
+    @Route          GET api/profiles/:id
+    @Description    Get profile by user id
+    @Access         Public
+*/
+ROUTER.get('/:id', async (request, response) => {
+  try {
+    // Initialize a variable containing the routed profile
+    const PROFILE = await PROFILE_MODEL.findOne({
+      user: request.params.id
+    }).populate('user', ['name', 'avatar']);
+
+    // Check if there is a profile for user
+    if (!PROFILE)
+      return response
+        .status(500)
+        .json({ message: 'There is no profile for this user' });
+
+    // respond to client
+    response.json(PROFILE);
+    //
+  } catch (error) {
+    console.error(error.message);
+    // Avoid mistaken server errors
+    if (error.kind == 'ObjectId') {
+      return response.status(400).json({ message: 'Profile not found' });
+    } else {
+      response.status(500).send('Server Error');
+    }
   }
 });
 

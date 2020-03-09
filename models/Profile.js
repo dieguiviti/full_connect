@@ -36,6 +36,28 @@ const PROFILE_SCHEMA = new SCHEMA({
     type: String,
     required: true
   },
+  competitions: [
+    {
+      competitionName: {
+        type: String,
+        required: true
+      },
+      division: {
+        type: String
+      },
+      standing: {
+        type: Number
+      },
+      location: {
+        type: String,
+        required: true
+      },
+      finishDate: {
+        type: Date,
+        required: true
+      }
+    }
+  ],
   trainerCredentials: [
     {
       credential: {
@@ -64,6 +86,9 @@ const PROFILE_SCHEMA = new SCHEMA({
       weight: {
         type: Number,
         required: true
+      },
+      date: {
+        type: Date
       }
     }
   ],
@@ -76,6 +101,9 @@ const PROFILE_SCHEMA = new SCHEMA({
       reps: {
         type: Number,
         required: true
+      },
+      date: {
+        type: Date
       }
     }
   ],
