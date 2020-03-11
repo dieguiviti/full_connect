@@ -257,6 +257,39 @@ ROUTER.put(
 );
 
 /*
+    @Route          DELETE api/profiles/me/credentials/:id
+    @Description    delete credential from profile
+    @Access         Private
+*/
+ROUTER.delete('/me/credentials/:id', AUTH, async (request, response) => {
+  // Attempt to find and delete corresponding target credential
+  try {
+    // Target profile
+    const TARGET_PROFILE = await PROFILE_MODEL.findOne({
+      user: request.user.id
+    });
+    // Find Corresponding credential's index
+    const CREDENTIAL_INDEX = TARGET_PROFILE.trainerCredentials
+      .map(credential => credential._id)
+      .indexOf(request.params.id);
+    // Splice credentials array if index exists
+    if (CREDENTIAL_INDEX >= 0) {
+      TARGET_PROFILE.trainerCredentials.splice(CREDENTIAL_INDEX, 1);
+    } else {
+      return response.status(400).json({ message: 'No such credential' });
+    }
+    // Persist changes
+    await TARGET_PROFILE.save();
+    // Response
+    response.json(TARGET_PROFILE.trainerCredentials);
+    //
+  } catch (error) {
+    console.error(error.message);
+    response.status(500).send('Server Error');
+  }
+});
+
+/*
     @Route          PUT api/profiles/me/competitions
     @Description    add competition to profile
     @Access         Private
@@ -307,6 +340,39 @@ ROUTER.put(
 );
 
 /*
+    @Route          DELETE api/profiles/me/competitions/:id
+    @Description    delete competition from profile
+    @Access         Private
+*/
+ROUTER.delete('/me/competitions/:id', AUTH, async (request, response) => {
+  // Attempt to find and delete corresponding competition
+  try {
+    // Find Target profile
+    const TARGET_PROFILE = await PROFILE_MODEL.findOne({
+      user: request.user.id
+    });
+    // Find Competition index
+    const COMPETITION_INDEX = TARGET_PROFILE.competitions
+      .map(competition => competition._id)
+      .indexOf(request.params.id);
+    // Splice competition array if index is found
+    if (COMPETITION_INDEX >= 0) {
+      TARGET_PROFILE.competitions.splice(COMPETITION_INDEX, 1);
+    } else {
+      return response.status(400).json({ message: 'No such competition' });
+    }
+    // Persist change
+    await TARGET_PROFILE.save();
+    // Response
+    response.json(TARGET_PROFILE.competitions);
+    //
+  } catch (error) {
+    console.error(error.message);
+    response.status(500).send('Server Error');
+  }
+});
+
+/*
     @Route          PUT api/profiles/me/personalrecords
     @Description    add personal record to profile
     @Access         Private
@@ -322,12 +388,12 @@ ROUTER.put(
     }
     // No errors? Assign props
     const { movement, weight } = request.body;
-    // Create new credential object
+    // Create new pr object
     const NEW_PR = {
       movement,
       weight
     };
-    // Attempt to find profile in db and assign new credential
+    // Attempt to find profile in db and assign new pr
     try {
       const TARGET_PROFILE = await PROFILE_MODEL.findOne({
         user: request.user.id
@@ -348,6 +414,39 @@ ROUTER.put(
 );
 
 /*
+    @Route          DELETE api/profiles/me/personalrecords/:id
+    @Description    delete competition from profile
+    @Access         Private
+*/
+ROUTER.delete('/me/personalrecords/:id', AUTH, async (request, response) => {
+  // Attempt to find and delete corresponding personal record
+  try {
+    // Find Target profile
+    const TARGET_PROFILE = await PROFILE_MODEL.findOne({
+      user: request.user.id
+    });
+    // Find personal record index
+    const PR_INDEX = TARGET_PROFILE.personalRecords
+      .map(personalRecord => personalRecord._id)
+      .indexOf(request.params.id);
+    // Splice personal records array if index is found
+    if (PR_INDEX >= 0) {
+      TARGET_PROFILE.personalRecords.splice(PR_INDEX, 1);
+    } else {
+      return response.status(400).json({ message: 'No such pr' });
+    }
+    // Persist change
+    await TARGET_PROFILE.save();
+    // Response
+    response.json(TARGET_PROFILE.personalRecords);
+    //
+  } catch (error) {
+    console.error(error.message);
+    response.status(500).send('Server Error');
+  }
+});
+
+/*
     @Route          PUT api/profiles/me/maxrepetitions
     @Description    add max repetition to profile
     @Access         Private
@@ -363,12 +462,12 @@ ROUTER.put(
     }
     // No errors? Assign props
     const { movement, reps } = request.body;
-    // Create new credential object
+    // Create new mr object
     const NEW_MR = {
       movement,
       reps
     };
-    // Attempt to find profile in db and assign new credential
+    // Attempt to find profile in db and assign new mr
     try {
       const TARGET_PROFILE = await PROFILE_MODEL.findOne({
         user: request.user.id
@@ -387,6 +486,39 @@ ROUTER.put(
     }
   }
 );
+
+/*
+    @Route          DELETE api/profiles/me/maxrepetitions/:id
+    @Description    delete maxrepetition from profile
+    @Access         Private
+*/
+ROUTER.delete('/me/maxrepetitions/:id', AUTH, async (request, response) => {
+  // Attempt to find and delete corresponding competition
+  try {
+    // Find Target profile
+    const TARGET_PROFILE = await PROFILE_MODEL.findOne({
+      user: request.user.id
+    });
+    // Find Competition index
+    const MR_INDEX = TARGET_PROFILE.maxRepetitions
+      .map(maxRepetition => maxRepetition._id)
+      .indexOf(request.params.id);
+    // Splice max repetitions array if index is found
+    if (MR_INDEX >= 0) {
+      TARGET_PROFILE.maxRepetitions.splice(MR_INDEX, 1);
+    } else {
+      return response.status(400).json({ message: 'No such mr' });
+    }
+    // Persist change
+    await TARGET_PROFILE.save();
+    // Response
+    response.json(TARGET_PROFILE.maxRepetitions);
+    //
+  } catch (error) {
+    console.error(error.message);
+    response.status(500).send('Server Error');
+  }
+});
 
 /*
     @Route          GET api/profiles
