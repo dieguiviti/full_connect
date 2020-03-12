@@ -214,6 +214,31 @@ ROUTER.delete('/me', AUTH, async (request, response) => {
 });
 
 /*
+    @Route          GET api/profiles/me/credentials
+    @Description    Get all trainer credentials
+    @Access         Private
+*/
+ROUTER.get('/me/credentials/', AUTH, async (request, response) => {
+  // Attemp to find target profile credentials and serve them
+  try {
+    // Get target profile
+    const TARGET_PROFILE = await PROFILE_MODEL.findOne({
+      user: request.user.id
+    });
+    // Show credentials
+    if (TARGET_PROFILE.trainerCredentials.length == 0) {
+      response.json({ message: 'No credentials here, Go ahead and add one' });
+    } else {
+      response.json(TARGET_PROFILE.trainerCredentials);
+    }
+    //
+  } catch (error) {
+    console.error(error.message);
+    response.status(500).send('Server Error');
+  }
+});
+
+/*
     @Route          PUT api/profiles/me/credentials
     @Description    add trainer credentials
     @Access         Private
@@ -282,6 +307,31 @@ ROUTER.delete('/me/credentials/:id', AUTH, async (request, response) => {
     await TARGET_PROFILE.save();
     // Response
     response.json(TARGET_PROFILE.trainerCredentials);
+    //
+  } catch (error) {
+    console.error(error.message);
+    response.status(500).send('Server Error');
+  }
+});
+
+/*
+    @Route          GET api/profiles/me/competitions
+    @Description    Get all competitions
+    @Access         Private
+*/
+ROUTER.get('/me/competitions/', AUTH, async (request, response) => {
+  // Attemp to find target profile credentials and serve them
+  try {
+    // Get target profile
+    const TARGET_PROFILE = await PROFILE_MODEL.findOne({
+      user: request.user.id
+    });
+    // Show competitions
+    if (TARGET_PROFILE.competitions.length == 0) {
+      response.json({ message: 'No competitions here, Go ahead and add one' });
+    } else {
+      response.json(TARGET_PROFILE.competitions);
+    }
     //
   } catch (error) {
     console.error(error.message);
@@ -373,6 +423,33 @@ ROUTER.delete('/me/competitions/:id', AUTH, async (request, response) => {
 });
 
 /*
+    @Route          GET api/profiles/me/personalrecords
+    @Description    Get all personalrecords
+    @Access         Private
+*/
+ROUTER.get('/me/personalrecords/', AUTH, async (request, response) => {
+  // Attemp to find target profile personalrecords and serve them
+  try {
+    // Get target profile
+    const TARGET_PROFILE = await PROFILE_MODEL.findOne({
+      user: request.user.id
+    });
+    // Show personalrecords
+    if (TARGET_PROFILE.personalRecords.length == 0) {
+      response.json({
+        message: 'No personalrecords here, Go ahead and add one'
+      });
+    } else {
+      response.json(TARGET_PROFILE.personalRecords);
+    }
+    //
+  } catch (error) {
+    console.error(error.message);
+    response.status(500).send('Server Error');
+  }
+});
+
+/*
     @Route          PUT api/profiles/me/personalrecords
     @Description    add personal record to profile
     @Access         Private
@@ -439,6 +516,33 @@ ROUTER.delete('/me/personalrecords/:id', AUTH, async (request, response) => {
     await TARGET_PROFILE.save();
     // Response
     response.json(TARGET_PROFILE.personalRecords);
+    //
+  } catch (error) {
+    console.error(error.message);
+    response.status(500).send('Server Error');
+  }
+});
+
+/*
+    @Route          GET api/profiles/me/maxrepetitions
+    @Description    Get all maxrepetitions
+    @Access         Private
+*/
+ROUTER.get('/me/maxrepetitions/', AUTH, async (request, response) => {
+  // Attemp to find target profile maxrepetitions and serve them
+  try {
+    // Get target profile
+    const TARGET_PROFILE = await PROFILE_MODEL.findOne({
+      user: request.user.id
+    });
+    // Show maxrepetitions
+    if (TARGET_PROFILE.maxRepetitions.length == 0) {
+      response.json({
+        message: 'No Max repetitions here, Go ahead and add one'
+      });
+    } else {
+      response.json(TARGET_PROFILE.maxRepetitions);
+    }
     //
   } catch (error) {
     console.error(error.message);

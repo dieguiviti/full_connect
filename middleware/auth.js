@@ -10,12 +10,12 @@ module.exports = (request, response, next) => {
   if (!TOKEN)
     return response
       .status(401)
-      .json({ message: 'No toke, authorization denied' });
+      .json({ message: 'No token, authorization denied' });
   // We do, lets attempt to VERIFY it
   try {
     const DECODED = JWT.verify(TOKEN, SECRET);
-    request.user = DECODED.user; // refers to user payload in the json web token
-
+    request.user = DECODED.user; // set user object of request equal to
+    // jump to next function
     next();
     // Assert errors
   } catch (error) {
