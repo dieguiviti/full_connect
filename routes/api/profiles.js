@@ -20,7 +20,7 @@ const ADD_MAX_REPETITIONS = require('../../controllers/profiles/records/maxRepet
 const DELETE_MAX_REPETITIONS = require('../../controllers/profiles/records/maxRepetitions/deleteMaxRepetition');
 
 // Express validator
-const { check, validationResult } = require('express-validator');
+const { check } = require('express-validator');
 //
 // VALIDATORS:
 //
