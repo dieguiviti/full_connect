@@ -3,6 +3,10 @@ const SCHEMA = MONGOOSE.Schema;
 
 // Create Model
 const WOD_SCHEMA = new SCHEMA({
+  wodName: {
+    type: String,
+    unique: true
+  },
   user: {
     type: SCHEMA.Types.ObjectId,
     ref: 'user'
@@ -28,8 +32,14 @@ const WOD_SCHEMA = new SCHEMA({
   tabata: [
     {
       movements: {
-        type: String,
-        required: true
+        type: String
+      },
+      maxReps: {
+        type: Boolean,
+        default: false
+      },
+      description: {
+        type: String
       }
     }
   ],
@@ -47,18 +57,28 @@ const WOD_SCHEMA = new SCHEMA({
           },
           reps: {
             type: Number
+          },
+          maxReps: {
+            type: Boolean,
+            default: false
           }
         }
-      ]
+      ],
+      result: {
+        reps: {
+          type: Number
+        },
+        rounds: {
+          type: Number
+        }
+      }
     }
   ],
   forTime: [
     {
       timeCap: {
-        minutes: {
-          type: Number,
-          required: true
-        }
+        type: Number,
+        required: true
       },
       movements: [
         {
@@ -91,7 +111,8 @@ const WOD_SCHEMA = new SCHEMA({
   amrap: [
     {
       time: {
-        type: Number
+        type: Number,
+        required: true
       },
       movements: [
         {
@@ -108,17 +129,19 @@ const WOD_SCHEMA = new SCHEMA({
         rounds: {
           type: Number
         },
-        reps: {
-          quantity: {
-            type: Number
-          },
-          movement: {
-            type: String,
-            required: true
-          },
-          reps: {
-            type: Number
+        reps: [
+          {
+            movement: {
+              type: String,
+              required: true
+            },
+            reps: {
+              type: Number
+            }
           }
+        ],
+        totalReps: {
+          type: Number
         }
       }
     }
@@ -138,6 +161,9 @@ const WOD_SCHEMA = new SCHEMA({
         ref: 'user'
       },
       name: {
+        type: String
+      },
+      avatar: {
         type: String
       }
     }
@@ -167,6 +193,12 @@ const WOD_SCHEMA = new SCHEMA({
           user: {
             type: SCHEMA.Types.ObjectId,
             ref: 'user'
+          },
+          name: {
+            type: String
+          },
+          avatar: {
+            type: String
           }
         }
       ]

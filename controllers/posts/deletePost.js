@@ -38,7 +38,7 @@ const DELETE_POST = async (request, response) => {
     //
   } catch (error) {
     if (error.kind === 'ObjectId') {
-      console.error(`\n${error.message}`.red.bold);
+      console.error(`\n${error.message}`);
       response.status(404).json({ message: 'No such post' });
     } else {
       console.error(error.message);
